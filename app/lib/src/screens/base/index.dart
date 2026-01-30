@@ -15,6 +15,7 @@ import 'package:app/src/controllers/showcase/showcase_controller.dart';
 import 'package:app/src/controllers/store/mutual_fund/basket_controller.dart';
 import 'package:app/src/screens/clients/client_list/view/client_list_screen.dart';
 import 'package:app/src/screens/home/view/home_screen.dart';
+import 'package:app/src/screens/opportunities/views/opportunities_screen.dart';
 import 'package:app/src/screens/proposals/proposal_list/view/proposal_list_screen.dart';
 import 'package:app/src/screens/resources/view/resources_screen.dart';
 import 'package:app/src/screens/store/store_home/view/store_screen.dart';
@@ -196,7 +197,7 @@ class _BaseScreenState extends State<BaseScreen> {
         case Screens.CLIENTS:
           return ClientListScreen();
         case Screens.RESOURCES:
-          return ResourcesScreen();
+          return OpportunitiesScreen();
         default:
           return HomeScreen();
       }

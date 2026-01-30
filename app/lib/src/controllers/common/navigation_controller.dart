@@ -33,7 +33,7 @@ extension ScreenEx on Screens {
       case Screens.CLIENTS:
         return 'Clients';
       case Screens.RESOURCES:
-        return 'Resources';
+        return 'Opportunities';
       case Screens.HOME:
       default:
         return 'Home';
