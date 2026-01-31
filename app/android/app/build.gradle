@@ -78,7 +78,7 @@ android {
         applicationId "in.wealthy.android.advisor"
         // Updated minSdkVersion from 21 to 23 as required by firebase_analytics library
         // Note: This means the app will not be available to users running Android versions below API 23 (Android 6.0)
-        minSdkVersion 23
+        minSdkVersion flutter.minSdkVersion
         // Updated to API 35 for better compatibility with latest dependencies
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()

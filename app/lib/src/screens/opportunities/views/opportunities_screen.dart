@@ -1,9 +1,9 @@
 import 'package:app/src/config/constants/enums.dart';
 import 'package:app/src/controllers/opportunities_controller.dart';
+import 'package:app/src/screens/opportunities/widgets/ai_loading_widget.dart';
 import 'package:app/src/screens/opportunities/widgets/opportunities_error.dart';
 import 'package:app/src/screens/opportunities/widgets/opportunities_focus.dart';
 import 'package:app/src/screens/opportunities/widgets/opportunities_insurance.dart';
-import 'package:app/src/screens/opportunities/widgets/opportunities_loader.dart';
 import 'package:app/src/screens/opportunities/widgets/opportunities_overview.dart';
 import 'package:app/src/screens/opportunities/widgets/opportunities_portfolio.dart';
 import 'package:app/src/screens/opportunities/widgets/opportunities_sip.dart';
@@ -20,13 +20,6 @@ class OpportunitiesScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
         titleText: 'Opportunities',
-        // trailingWidgets: [
-        //   Container(
-        //     width: 120,
-        //     alignment: Alignment.centerRight,
-        //     child: NewsletterYearDropdown(),
-        //   ),
-        // ],
       ),
       body: GetBuilder<OpportunitiesController>(
         init: OpportunitiesController(),
@@ -34,25 +27,22 @@ class OpportunitiesScreen extends StatelessWidget {
           state.controller?.initializeOpportunitiesData();
         },
         builder: (controller) {
-          // if (controller.opportunitiesOverviewResponse.state ==
-          //     NetworkState.loading) {
-          //   return Center(
-          //     child: OpportunitiesLoader(
-          //       size: 60,
-          //       color: const Color(0xFF7F30FE),
-          //     ),
-          //   );
-          // }
+          // Show AI Loading Widget during initial data fetch
+          if (controller.opportunitiesOverviewResponse.state ==
+              NetworkState.loading) {
+            return const AiLoadingWidget();
+          }
 
-          // if (controller.opportunitiesOverviewResponse.state ==
-          //     NetworkState.error) {
-          //   return OpportunitiesError(
-          //     message: controller.opportunitiesOverviewResponse.message,
-          //     onRetry: () {
-          //       controller.initializeOpportunitiesData();
-          //     },
-          //   );
-          // }
+          // Show error state with retry option
+          if (controller.opportunitiesOverviewResponse.state ==
+              NetworkState.error) {
+            return OpportunitiesError(
+              message: controller.opportunitiesOverviewResponse.message,
+              onRetry: () {
+                controller.initializeOpportunitiesData();
+              },
+            );
+          }
 
           return SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 100),
@@ -75,3 +65,4 @@ class OpportunitiesScreen extends StatelessWidget {
     );
   }
 }
+
