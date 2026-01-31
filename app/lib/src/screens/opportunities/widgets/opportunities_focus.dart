@@ -1,11 +1,5 @@
-import 'package:app/src/config/constants/string_constants.dart';
-import 'package:app/src/config/routes/router.gr.dart';
 import 'package:app/src/controllers/opportunities_controller.dart';
-import 'package:app/src/screens/opportunities/widgets/portfolio_review_bottomsheet.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:core/modules/clients/models/client_list_model.dart';
-import 'package:core/modules/clients/models/new_client_model.dart';
-import 'package:core/modules/clients/models/sip_user_data_model.dart';
+import 'package:app/src/screens/opportunities/widgets/focus_client_bottom_sheet.dart';
 import 'package:core/modules/opportunities/models/opportunities_overview_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
@@ -28,7 +22,7 @@ class OpportunitiesFocus extends StatelessWidget {
         return Column(
           children: [
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
+              margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,47 +66,56 @@ class OpportunitiesFocus extends StatelessWidget {
 }
 
 class ClientCard extends StatelessWidget {
-  final TopFocusClient client; // TopFocusClient from API
+  final TopFocusClient client;
 
   const ClientCard({Key? key, required this.client}) : super(key: key);
 
   String _getInitials(String name) {
+    if (name.isEmpty) return '?';
     final parts = name.split(' ');
-    if (parts.length >= 2) {
+    if (parts.length >= 2 && parts[0].isNotEmpty && parts[1].isNotEmpty) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
     return name.substring(0, 1).toUpperCase();
   }
 
-  Color _getTagColor(String tag, bool isBackground) {
-    if (tag.toLowerCase().contains('risk') ||
-        tag.toLowerCase().contains('stopped')) {
-      return isBackground ? const Color(0xFFFEE2E2) : const Color(0xFFDC2626);
-    } else if (tag.toLowerCase().contains('opp') ||
-        tag.toLowerCase().contains('insurance')) {
-      return isBackground ? const Color(0xFFEDE9FE) : const Color(0xFF7C3AED);
-    } else if (tag.toLowerCase().contains('growth') ||
-        tag.toLowerCase().contains('stagnant')) {
-      return isBackground ? const Color(0xFFFED7AA) : const Color(0xFFEA580C);
-    } else if (tag.toLowerCase().contains('portfolio') ||
-        tag.toLowerCase().contains('underperform')) {
-      return isBackground ? const Color(0xFFE5E7EB) : const Color(0xFF6B7280);
+  Color _getTagBgColor(String tag) {
+    final lower = tag.toLowerCase();
+    if (lower.contains('risk') || lower.contains('stopped')) {
+      return const Color(0xFFFEE2E2);
+    } else if (lower.contains('opp') || lower.contains('insurance')) {
+      return const Color(0xFFEDE9FE);
+    } else if (lower.contains('growth') || lower.contains('stagnant')) {
+      return const Color(0xFFFED7AA);
+    } else if (lower.contains('portfolio') || lower.contains('underperform')) {
+      return const Color(0xFFE5E7EB);
     }
-    return isBackground ? const Color(0xFFE5E7EB) : const Color(0xFF6B7280);
+    return const Color(0xFFE5E7EB);
+  }
+
+  Color _getTagTextColor(String tag) {
+    final lower = tag.toLowerCase();
+    if (lower.contains('risk') || lower.contains('stopped')) {
+      return const Color(0xFFDC2626);
+    } else if (lower.contains('opp') || lower.contains('insurance')) {
+      return const Color(0xFF7C3AED);
+    } else if (lower.contains('growth') || lower.contains('stagnant')) {
+      return const Color(0xFFEA580C);
+    } else if (lower.contains('portfolio') || lower.contains('underperform')) {
+      return const Color(0xFF6B7280);
+    }
+    return const Color(0xFF6B7280);
   }
 
   IconData _getTagIcon(String tag) {
-    if (tag.toLowerCase().contains('risk') ||
-        tag.toLowerCase().contains('stopped')) {
+    final lower = tag.toLowerCase();
+    if (lower.contains('risk') || lower.contains('stopped')) {
       return Icons.warning_amber_rounded;
-    } else if (tag.toLowerCase().contains('opp') ||
-        tag.toLowerCase().contains('insurance')) {
+    } else if (lower.contains('opp') || lower.contains('insurance')) {
       return Icons.lightbulb_outline;
-    } else if (tag.toLowerCase().contains('growth') ||
-        tag.toLowerCase().contains('stagnant')) {
+    } else if (lower.contains('growth') || lower.contains('stagnant')) {
       return Icons.trending_up;
-    } else if (tag.toLowerCase().contains('portfolio') ||
-        tag.toLowerCase().contains('underperform')) {
+    } else if (lower.contains('portfolio') || lower.contains('underperform')) {
       return Icons.bar_chart;
     }
     return Icons.info_outline;
@@ -121,47 +124,14 @@ class ClientCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initials = _getInitials(client.clientName);
-    final tags = client.tags as List<String>? ?? [];
-
-    // Determine opportunity type based on drillDownDetails
-    final hasPortfolioIssue = client.drillDownDetails.portfolioReview.hasIssue;
-    final hasStoppedSips =
-        client.drillDownDetails.sipHealth.stoppedSips.isNotEmpty;
-    final hasStagnantSips =
-        client.drillDownDetails.sipHealth.stagnantSips.isNotEmpty;
-    final hasInsurance = client.drillDownDetails.insurance.hasGap;
+    final tags = client.tags;
 
     return InkWell(
       onTap: () {
-        // Create client model
-        final clientModel = NewClientModel.fromJson({
-          'user_id': client.userId,
-          'name': client.clientName,
-        });
-
-        // Navigate based on priority: Portfolio > SIP > Insurance
-        if (hasPortfolioIssue) {
-          // PortfolioReviewBottomSheet.show(context, portfolioClient);
-        } else if (hasStoppedSips || hasStagnantSips) {
-          // Navigate to SIP detail screen
-          Client clientModel = Client.fromJson({
-            'user_id': client.userId,
-            'name': client.clientName,
-          });
-          AutoRouter.of(context).push(
-            SipDetailRoute(
-                client: clientModel,
-                sipUserData: SipUserDataModel.fromJson({})),
-          );
-        } else if (hasInsurance) {
-          // Navigate to insurance quotes
-          AutoRouter.of(context).push(InsuranceGenerateQuotesRoute(
-            productVariant: InsuranceProductVariant.HEALTH,
-            insuranceData: null,
-            selectedClient: null,
-          ));
-        }
+        // Show Drill-Down Bottom Sheet
+        FocusClientBottomSheet.show(context, client);
       },
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         padding: const EdgeInsets.all(20),
@@ -217,7 +187,7 @@ class ClientCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        client.totalImpactValue,
+                        client.formattedImpactValue,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -241,8 +211,8 @@ class ClientCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: tags.map((tag) {
-                final bgColor = _getTagColor(tag, true);
-                final textColor = _getTagColor(tag, false);
+                final bgColor = _getTagBgColor(tag);
+                final textColor = _getTagTextColor(tag);
                 final icon = _getTagIcon(tag);
 
                 return Container(

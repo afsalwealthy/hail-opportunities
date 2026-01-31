@@ -1,4 +1,5 @@
 import 'package:app/src/config/routes/router.gr.dart';
+import 'package:app/src/screens/opportunities/widgets/sip_revival_bottomsheet.dart';
 import 'package:app/src/screens/opportunities/widgets/sip_stepup_bottomsheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:core/modules/clients/models/client_list_model.dart';
@@ -13,6 +14,7 @@ class SipOpportunityItem extends StatelessWidget {
   final String statusText;
   final bool isStopped;
   final StagnantSipOpportunity? stagnantOpportunity;
+  final StoppedSipOpportunity? stoppedOpportunity;
 
   const SipOpportunityItem({
     Key? key,
@@ -22,6 +24,7 @@ class SipOpportunityItem extends StatelessWidget {
     required this.statusText,
     this.isStopped = false,
     this.stagnantOpportunity,
+    this.stoppedOpportunity,
   }) : super(key: key);
 
   @override
@@ -32,20 +35,10 @@ class SipOpportunityItem extends StatelessWidget {
       'name': name,
     });
 
-    return InkWell(
-      onTap: () {
-        if (!isStopped && stagnantOpportunity != null) {
-          // Open bottom sheet for stagnant SIPs
-          SipStepUpBottomSheet.show(context, stagnantOpportunity!);
-        } else {
-          // Navigate to SIP detail for stopped SIPs
-          AutoRouter.of(context).push(
-            SipDetailRoute(
-                client: client, sipUserData: SipUserDataModel.fromJson({})),
-          );
-        }
-      },
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Details
           Expanded(
@@ -68,7 +61,7 @@ class SipOpportunityItem extends StatelessWidget {
                       ? '-'
                       : fundName.length == 1
                           ? fundName[0]
-                          : '${fundName[0]} +${fundName.length}',
+                          : '${fundName[0]} +${fundName.length - 1}',
                   style: const TextStyle(
                     fontSize: 13,
                     color: Color(0xFF6B7280),
@@ -76,9 +69,8 @@ class SipOpportunityItem extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
+                // Status Badge
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -99,23 +91,104 @@ class SipOpportunityItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
               ],
             ),
           ),
 
-          // Status Badge with Arrow
-          Row(
-            children: [
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Color(0xFF9CA3AF),
-              ),
-            ],
-          ),
+          const SizedBox(width: 12),
+
+          // Distinct CTA Button
+          _buildActionButton(context),
         ],
       ),
     );
+  }
+
+  Widget _buildActionButton(BuildContext context) {
+    if (isStopped) {
+      // STOPPED SIP - Orange "Pitch Restart" button
+      return GestureDetector(
+        onTap: () {
+          if (stoppedOpportunity != null) {
+            SipRevivalBottomSheet.show(context, stoppedOpportunity!);
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEA580C),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFEA580C).withOpacity(0.3),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(
+                Icons.restore,
+                color: Colors.white,
+                size: 16,
+              ),
+              SizedBox(width: 6),
+              Text(
+                'Pitch Restart',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      // STAGNANT SIP - Purple "Pitch Step-up" button
+      return GestureDetector(
+        onTap: () {
+          if (stagnantOpportunity != null) {
+            SipStepUpBottomSheet.show(context, stagnantOpportunity!);
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF6725F4),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF6725F4).withOpacity(0.3),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(
+                Icons.trending_up,
+                color: Colors.white,
+                size: 16,
+              ),
+              SizedBox(width: 6),
+              Text(
+                'Pitch Step-up',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }

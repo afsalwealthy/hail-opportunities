@@ -134,6 +134,56 @@ class _OpportunitiesSipState extends State<OpportunitiesSip> {
                 ],
               ),
 
+              // Revenue Alert Banner - Show when stopped SIPs exist
+              if (stoppedOpps.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFFFF7ED),
+                        const Color(0xFFFEF2F2),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFFFED7AA),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEA580C).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.lightbulb_outline,
+                          color: Color(0xFFEA580C),
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '💡 Revenue Alert: ${stoppedOpps.length} client${stoppedOpps.length > 1 ? 's have' : ' has'} stopped SIPs. Reviving them recovers AUM.',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFC2410C),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
               // Divider line
               const Divider(height: 1, color: Color(0xFFE5E7EB)),
               const SizedBox(height: 16),
@@ -190,6 +240,7 @@ class _OpportunitiesSipState extends State<OpportunitiesSip> {
                         ],
                         statusText: '${opp.daysSinceAnySuccess} Days Silent',
                         isStopped: true,
+                        stoppedOpportunity: opp,
                       ),
                     ],
                   );

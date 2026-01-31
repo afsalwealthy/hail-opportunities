@@ -329,6 +329,54 @@ class OpportunitiesInsurance extends StatelessWidget {
                 ],
               ),
 
+              // Asset Protection Banner
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFF0FDFA),
+                      const Color(0xFFECFDF5),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF99F6E4),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0D9488).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.shield_outlined,
+                        color: Color(0xFF0D9488),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        '🛡️ Asset Protection: These HNI clients have wealth at risk. Pitching a term plan protects their portfolio.',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF115E59),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               // Divider line
               const Divider(height: 1, color: Color(0xFFE5E7EB)),
               const SizedBox(height: 16),
